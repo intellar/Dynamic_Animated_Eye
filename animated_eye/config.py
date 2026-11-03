@@ -100,6 +100,13 @@ class Config:
         """Corrige les valeurs aberrantes et renvoie la liste des avertissements."""
         warnings: list[str] = []
 
+        unknown = getattr(self, "_unknown_keys", ())
+        if unknown:
+            warnings.append(
+                "cles inconnues dans la configuration, ignorees : "
+                + ", ".join(unknown)
+            )
+
         if not self.images:
             self.images = ["eye2.jpg"]
             warnings.append("aucune image fournie, retour a eye2.jpg")
@@ -277,11 +284,23 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def apply_cli(cfg: Config, argv: list[str] | None = None) -> tuple[Config, argparse.Namespace]:
-    """Applique les arguments passes sur `cfg`. Renvoie (cfg, namespace)."""
+# Options qui pilotent le programme sans etre des cles de configuration.
+_CLI_ONLY = {"config", "list_displays", "selftest"}
+
+
+def load_from_argv(
+    argv: list[str] | None = None,
+) -> tuple[Config, argparse.Namespace]:
+    """Charge la configuration puis applique les arguments de la ligne de commande.
+
+    `--config` choisit le fichier ; sans lui, `config.json` a la racine du
+    projet. Le namespace est renvoye tel quel : `list_displays` et `selftest`
+    sont des modes d'execution, pas des reglages.
+    """
     ns = build_parser().parse_args(argv)
+    cfg = load_config(getattr(ns, "config", None) or DEFAULT_CONFIG_PATH)
     for key, value in vars(ns).items():
-        if key in {"config", "list_displays", "selftest"}:
+        if key in _CLI_ONLY:
             continue
         setattr(cfg, key, value)
     return cfg, ns

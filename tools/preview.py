@@ -31,7 +31,7 @@ import pygame  # noqa: E402
 from animated_eye.config import Config  # noqa: E402
 from animated_eye.eye_image import load_eyes  # noqa: E402
 from animated_eye.pupil import PupilState  # noqa: E402
-from animated_eye.saccade import SaccadeController  # noqa: E402
+from animated_eye.saccade import Phase, SaccadeController  # noqa: E402
 from animated_eye.world import build_world  # noqa: E402
 
 
@@ -160,9 +160,9 @@ def main(argv: list[str] | None = None) -> int:
         ctrl.update(dt)
         if ctrl.saccade_started:
             amps.append(ctrl.saccade_amplitude_px)
-            durs.append(ctrl._duration * 1000)
-        if before.value == "saccade" and ctrl.phase.value == "fixation":
-            fixes.append(ctrl._duration * 1000)
+            durs.append(ctrl.duration_ms)
+        if before is Phase.SACCADE and ctrl.phase is Phase.FIXATION:
+            fixes.append(ctrl.duration_ms)
     if amps:
         print(
             f"\n30 s de simulation : {len(amps)} saccades, "

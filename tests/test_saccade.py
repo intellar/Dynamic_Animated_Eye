@@ -67,7 +67,7 @@ def test_saccade_durations_respect_the_configured_range():
     for _ in range(60 * 120):
         ctrl.update(DT)
         if ctrl.saccade_started:
-            durations.append(ctrl._duration * 1000.0)
+            durations.append(ctrl.duration_ms)
     assert durations
     assert min(durations) >= cfg.saccade_min_ms - 1e-6
     assert max(durations) <= cfg.saccade_max_ms + 1e-6
@@ -76,8 +76,8 @@ def test_saccade_durations_respect_the_configured_range():
 def test_larger_saccades_last_longer():
     cfg = Config()
     ctrl = SaccadeController(cfg, random.Random(5))
-    small = ctrl._saccade_duration(0.05, 0.0)
-    large = ctrl._saccade_duration(1.0, 0.0)
+    small = ctrl.saccade_duration(0.05, 0.0)
+    large = ctrl.saccade_duration(1.0, 0.0)
     assert large > small
 
 

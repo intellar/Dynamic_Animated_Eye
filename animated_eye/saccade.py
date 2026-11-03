@@ -73,6 +73,11 @@ class SaccadeController:
             return 0.0
         return max(0.0, (self._duration - self._t) * 1000.0)
 
+    @property
+    def duration_ms(self) -> float:
+        """Duree de l'etat courant (fixation ou saccade), en millisecondes."""
+        return self._duration * 1000.0
+
     # ---------------------------------------------------------------- tirage
     def _draw_fixation_duration(self) -> float:
         """Duree de fixation en secondes, tirage log-normal borne."""
@@ -107,7 +112,7 @@ class SaccadeController:
             _clamp(amplitude * math.sin(theta)),
         )
 
-    def _saccade_duration(self, dx: float, dy: float) -> float:
+    def saccade_duration(self, dx: float, dy: float) -> float:
         """Duree en secondes : croissante avec l'amplitude en pixels."""
         amp_px = math.hypot(dx * self.cfg.travel_x, dy * self.cfg.travel_y)
         max_px = max(math.hypot(self.cfg.travel_x, self.cfg.travel_y), 1.0)
@@ -125,7 +130,7 @@ class SaccadeController:
         dx = self._seg_end[0] - self._seg_start[0]
         dy = self._seg_end[1] - self._seg_start[1]
         self._duration = (
-            duration if duration is not None else self._saccade_duration(dx, dy)
+            duration if duration is not None else self.saccade_duration(dx, dy)
         )
         self._duration = max(self._duration, 0.001)
         self._resume_fixation = resume_fixation

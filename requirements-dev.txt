@@ -1,0 +1,3 @@
+# Developpement : tests unitaires (les dependances d'execution sont incluses).
+-r requirements.txt
+pytest>=7.4

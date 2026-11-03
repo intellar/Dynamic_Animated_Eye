@@ -1,6 +1,43 @@
 # Animated eye
 
-Un oeil projete en plein ecran sur une toile, qui bouge par saccades.
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![Licence](https://img.shields.io/badge/licence-MIT-green)
+
+Un oeil projete en plein ecran qui bouge par saccades : balistique du regard,
+derive oculaire, micro-saccades, pupille qui change. Les photos ci-dessous
+montrent la projection sur la fenetre d'une maison, pour Halloween.
+
+[![L'oeil projete sur la fenetre d'une maison](docs/demo_1.png)](https://youtube.com/shorts/nhEulSRSSkg)
+
+[Voir l'animation en video](https://youtube.com/shorts/nhEulSRSSkg) (YouTube
+Shorts).
+
+| La facade, la nuit | Vue rapprochee : l'iris et ses fibres |
+|---|---|
+| ![L'oeil projete sur la fenetre d'une maison](docs/demo_1.png) | ![L'iris lumineux sur les trois carreaux](docs/demo_2.png) |
+
+## Demarrage rapide
+
+```bash
+pip install -r requirements.txt
+python main.py --list-displays    # reperer le projecteur
+python main.py --display 1        # projeter dessus
+```
+
+`python main.py --window --debug` ouvre une petite fenetre avec un HUD, pour
+regler sans projecteur. Tout se regle dans `config.json`, et chaque cle a une
+option de ligne de commande equivalente (`python main.py --help`).
+
+## Sommaire
+
+- [Le principe](#le-principe) : pourquoi c'est la fenetre qui glisse, pas l'oeil
+- [Installation](#installation) et [lancement](#lancement)
+- [Deploiement sur le Pi](#deploiement-sur-le-pi), avec demarrage automatique
+- [Reglages](#reglages) : la table des cles de `config.json`
+- [Commandes](#commandes) : les raccourcis clavier
+- [Verification sans projecteur](#verification-sans-projecteur) : planches et tests
+- [Structure du projet](#structure-du-projet) et [hygiene du depot](#hygiene-du-depot)
+- [Licence](#licence)
 
 ## Le principe
 
@@ -96,6 +133,8 @@ pip install -r requirements.txt
 
 Python 3.10 ou plus recent. Teste avec Python 3.12, pygame 2.6.1 (SDL 2.28).
 
+Pour les tests : `pip install -r requirements-dev.txt` (ajoute pytest).
+
 ## Lancement
 
 ```bash
@@ -104,6 +143,7 @@ python main.py --display 1          # sur le projecteur (deuxieme ecran)
 python main.py --window             # en fenetre, pour regler sans projeter
 python main.py --list-displays      # quelles sorties sont disponibles
 python main.py --debug              # avec un HUD
+python main.py --config autre.json  # un autre fichier de reglages
 ```
 
 Sous Windows, la resolution est lue sur l'ecran cible (`auto_size`) : si le
@@ -440,3 +480,28 @@ bord de l'ecran.
 4. Ajuster `iris_fraction` (taille de l'oeil) puis `travel_x` / `travel_y`
    (amplitude) ; le cadrage et le noir disponible en decoulent.
 5. `python main.py --display 1` pour la version finale.
+
+## Structure du projet
+
+```
+main.py                   point d'entree : python main.py
+animated_eye/             le paquet
+  cli.py                  options de ligne de commande, selftest
+  app.py                  boucle : simulation -> monde -> ecran
+  renderer.py             fenetre SDL (plein ecran, DPI, anti-veille)
+  world.py                la grande surface noire et la fenetre qui glisse
+  eye_image.py            chargement des images, mesure de l'iris, sprites
+  saccade.py              mouvement : minimum-jerk, derive, micro-saccades
+  pupil.py                changement de pupille (fondu ou coupe franche)
+  geometry.py             ROI, debattement, budget memoire (sans pygame)
+  config.py               config.json et arguments de ligne de commande
+assets/                   les images d'oeil (2048 x 2048)
+docs/                     les images du README
+scripts/                  deploiement du Pi, service systemd, hooks git
+tests/                    pytest, sans ecran (pilote SDL dummy)
+tools/preview.py          planches de controle rendues hors ecran
+```
+
+## Licence
+
+MIT, voir [LICENSE](LICENSE).

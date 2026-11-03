@@ -224,7 +224,8 @@ class App:
         )
 
     # ------------------------------------------------------------------- frame
-    def _frame(self, dt: float) -> None:
+    def step(self, dt: float) -> None:
+        """Avance la simulation d'un pas `dt` et redessine (voir `run`)."""
         assert self.pupil is not None and self.saccade is not None
         assert self.world is not None
 
@@ -271,7 +272,7 @@ class App:
             self._handle_events()
             if not self.running:
                 break
-            self._frame(dt)
+            self.step(dt)
             self.renderer.flip()
         self.renderer.close()
         return 0

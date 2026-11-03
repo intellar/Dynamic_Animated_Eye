@@ -171,12 +171,6 @@ class Renderer:
             self.hud_font = pygame.font.SysFont("consolas", 20)
 
     # ------------------------------------------------------------------ setup
-    def _flags(self) -> int:
-        flags = pygame.DOUBLEBUF
-        if self.fullscreen:
-            flags |= pygame.FULLSCREEN
-        return flags
-
     def _open(self, width: int, height: int, fullscreen: bool) -> None:
         self.fullscreen = fullscreen
         self.screen, self.driver, notes = open_window(
