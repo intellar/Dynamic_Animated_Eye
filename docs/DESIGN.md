@@ -59,11 +59,11 @@ The image must be **larger than the window**, otherwise there is nothing to
 slide. The program checks that at start-up and reports it:
 
 ```
-cadrage      ROI : la fenetre montre une decoupe de l'image
+framing      ROI: the window shows a crop of the image
 ```
 
-If you read `l'image tient dans la fenetre`, `iris_fraction` is too small: the
-eye is smaller than the screen and no crop is possible.
+If you read `the image fits in the window`, `iris_fraction` is too small: the eye
+is smaller than the screen and no crop is possible.
 
 ## The two settings that matter
 

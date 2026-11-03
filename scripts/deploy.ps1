@@ -51,8 +51,8 @@ if ([string]::IsNullOrWhiteSpace($Target) -and $env:ANIMATED_EYE_TARGET) {
     $Target = $env:ANIMATED_EYE_TARGET.Trim()
 }
 if ([string]::IsNullOrWhiteSpace($Target)) {
-    throw ("aucune cible : passer -Target utilisateur@hote, ou definir " +
-           "`$env:ANIMATED_EYE_TARGET = 'utilisateur@hote' (voir docs/DEPLOY.md)")
+    throw ("no target: pass -Target user@host, or set " +
+           "`$env:ANIMATED_EYE_TARGET = 'user@host' (see docs/DEPLOY.md)")
 }
 
 # Accepte `-Only a,b,c` (tableau) et `-Only "a,b,c"` (chaine).
@@ -80,7 +80,7 @@ $dirs = @()
 $pyTargets = @()
 foreach ($item in $Items) {
     $local = Join-Path $Root $item
-    if (-not (Test-Path $local)) { throw "introuvable : $item" }
+    if (-not (Test-Path $local)) { throw "not found: $item" }
     if (Test-Path $local -PathType Container) {
         $dirs += $item
         $pyTargets += $item
@@ -103,28 +103,28 @@ try {
     # fourni, il donne l'utilisateur et le $HOME reels du Pi. Sous Bookworm le
     # compte n'est pas `pi` et /home/pi n'existe pas : c'est ce qui faisait
     # echouer le mkdir sans explication utile.
-    Write-Host "==> connexion a $Target"
+    Write-Host "==> connecting to $Target"
     # Guillemets simples uniquement : le client OpenSSH de Windows retire les
     # guillemets doubles des commandes distantes (`printf "%s|%s\n"` arrive en
     # `printf %s|%s\n`, soit un tube vers `%sn`). `id -un; echo $HOME` est passe
     # tel quel a bash et donne deux lignes.
     $probe = @(& ssh @SshArgs $Target 'id -un; echo $HOME')
     if ($LASTEXITCODE -ne 0) {
-        throw "connexion ssh impossible vers $Target (voir le message ssh ci-dessus)"
+        throw "ssh connection to $Target failed (see the ssh message above)"
     }
     $probeLines = @($probe | Where-Object { $_.Trim() })
     if ($probeLines.Count -lt 2) {
-        throw "reponse inattendue du Pi : '$($probe -join ' / ')'"
+        throw "unexpected answer from the Pi: '$($probe -join ' / ')'"
     }
     $remoteUser = $probeLines[-2].Trim()
     $remoteHome = $probeLines[-1].Trim()
     if ([string]::IsNullOrWhiteSpace($Dest)) { $Dest = "$remoteHome/Animated_eye" }
-    Write-Host "    utilisateur $remoteUser, destination $Dest"
+    Write-Host "    user $remoteUser, destination $Dest"
 
     Write-Host "==> mkdir -p $Dest"
     & ssh @SshArgs $Target "mkdir -p '$Dest'"
     if ($LASTEXITCODE -ne 0) {
-        throw "mkdir -p $Dest impossible sur $Target (voir le message ssh ci-dessus)"
+        throw "mkdir -p $Dest failed on $Target (see the ssh message above)"
     }
 
     foreach ($item in $Items) {
@@ -142,7 +142,7 @@ try {
             Write-Host "==> scp $item"
             & scp @ScpArgs -q $local "${Target}:${remoteDir}/"
         }
-        if ($LASTEXITCODE -ne 0) { throw "copie echouee : $item" }
+        if ($LASTEXITCODE -ne 0) { throw "copy failed: $item" }
     }
 
     $steps = @("cd '$Dest'")
@@ -173,17 +173,17 @@ try {
 
     Write-Host "==> eol + venv + compile + selftest"
     & ssh @SshArgs $Target ($steps -join " && ")
-    if ($LASTEXITCODE -ne 0) { throw "etape distante echouee (voir ci-dessus)" }
+    if ($LASTEXITCODE -ne 0) { throw "remote step failed (see above)" }
 
     if ($Verify) {
         if (-not ($Items -contains "scripts")) {
-            Write-Warning "-Verify ignore : scripts/ n'a pas ete deploye"
+            Write-Warning "-Verify ignored: scripts/ was not deployed"
         } else {
-            Write-Host "==> verification des empreintes"
+            Write-Host "==> checking the checksums"
             $hasher = Join-Path $Root "scripts\hash_manifest.py"
             $localRaw = @(& python $hasher $Root @RelItems --digest)
             if ($LASTEXITCODE -ne 0 -or $localRaw.Count -eq 0) {
-                throw "empreinte locale impossible (voir ci-dessus)"
+                throw "local checksum failed (see above)"
             }
             $localDigest = $localRaw[-1].ToString().Trim()
             # `cd` indispensable : le hasher est un chemin relatif au projet, et
@@ -191,39 +191,39 @@ try {
             $remoteCmd = "cd '$Dest' && $python scripts/hash_manifest.py . $($RelItems -join ' ') --digest"
             $remoteRaw = @(& ssh @SshArgs $Target $remoteCmd)
             if ($LASTEXITCODE -ne 0 -or $remoteRaw.Count -eq 0) {
-                throw "empreinte distante impossible (voir le message ssh ci-dessus)"
+                throw "remote checksum failed (see the ssh message above)"
             }
             $remoteDigest = $remoteRaw[-1].ToString().Trim()
             if ($localDigest -ne $remoteDigest) {
-                throw "copie incomplete : local $localDigest, distant $remoteDigest"
+                throw "incomplete copy: local $localDigest, remote $remoteDigest"
             }
-            Write-Host "    empreinte identique : $localDigest"
+            Write-Host "    checksums match: $localDigest"
         }
     }
 
     if ($InstallService) {
         if (-not ($Items -contains "scripts")) {
-            Write-Warning "-InstallService ignore : scripts/ n'a pas ete deploye"
+            Write-Warning "-InstallService ignored: scripts/ was not deployed"
         } else {
             # Le script vit sur le Pi : il deduit l'utilisateur (SUDO_USER), le
             # dossier du projet et la carte DRM. `sudo -n` evite de rester bloque
             # sur une demande de mot de passe ; le message d'erreur donne alors la
             # commande a lancer a la main.
-            Write-Host "==> service systemd (demarrage au boot)"
+            Write-Host "==> systemd service (start at boot)"
             & ssh @SshArgs $Target "sudo -n sh '$Dest/scripts/install_service.sh'"
             if ($LASTEXITCODE -ne 0) {
-                throw ("installation du service impossible : lancer a la main  " +
+                throw ("service install failed: run it by hand  " +
                        "ssh $Target 'sudo sh $Dest/scripts/install_service.sh'")
             }
         }
     }
 
-    Write-Host "deploye dans ${Target}:${Dest}"
-    Write-Host "pour projeter :  ssh $Target 'sh $Dest/scripts/run_kms.sh'"
-    Write-Host "  (run_kms.sh pose SDL_VIDEODRIVER=kmsdrm et choisit la carte DRM qui"
-    Write-Host "   a un ecran branche : card0 sur Pi 4, card1 sur Pi 5)"
-    Write-Host "au boot :  .\scripts\deploy.ps1 -InstallService    (ou sudo sh $Dest/scripts/install_service.sh)"
-    Write-Host "si l'ecran refuse de s'ouvrir :  .venv/bin/python scripts/video_check.py"
+    Write-Host "deployed to ${Target}:${Dest}"
+    Write-Host "to project:  ssh $Target 'sh $Dest/scripts/run_kms.sh'"
+    Write-Host "  (run_kms.sh sets SDL_VIDEODRIVER=kmsdrm and picks the DRM card with"
+    Write-Host "   a connected display: card0 on a Pi 4, card1 on a Pi 5)"
+    Write-Host "at boot:  .\scripts\deploy.ps1 -InstallService    (or sudo sh $Dest/scripts/install_service.sh)"
+    Write-Host "if the screen refuses to open:  .venv/bin/python scripts/video_check.py"
 } finally {
     Pop-Location
 }

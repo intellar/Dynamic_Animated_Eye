@@ -82,23 +82,26 @@ git config core.hooksPath scripts/hooks    # enable the secret guard (once)
 ## Validate a change — checklist
 
 1. `python -m pytest tests -q` → all green, no display needed.
-2. `python main.py --selftest` → exit 0, `cadrage ROI …`, and a plausible fps.
+2. `python main.py --selftest` → exit 0, `framing ROI …`, and a plausible fps.
 3. `python tools/preview.py` → look at `preview/*.png`. Stable reference values
    with the shipped config: ~1.6 saccades/s, 251 px mean amplitude, 545 px max,
    47 ms mean saccade, 335 ms mean fixation. A change to `travel_*` or
    `iris_fraction` moves these numbers; a change to the motion model should not
    move them wildly.
-4. If geometry changed: read the start-up report (`fenetre`, `monde`, `oeil`,
-   `debattement`) and confirm `monde = image + 2 x travel` and that the eye is
+4. If geometry changed: read the start-up report (`window`, `world`, `eye`,
+   `travel`) and confirm `world = image + 2 x travel` and that the eye is
    still inside the frame at the extremes.
 
 ## Conventions
 
 - Python 3.10+, `from __future__ import annotations`, dataclasses, type hints on
   public functions. No formatter is configured: match the surrounding style.
-- **Code comments and docstrings are French** (without accents, ASCII only);
-  README, `docs/` and `AGENTS.md` are English. When you touch a file, stay in the
-  language of that file rather than mixing.
+- **Two languages, one rule per side of the screen.** Everything the program
+  shows — console report, warnings, `--help`, HUD labels, the systemd
+  `Description=`, the labels burned into the preview sheets — is **English**.
+  Everything that never leaves the source — comments and docstrings — is
+  **French**, without accents (ASCII only). README, `docs/` and `AGENTS.md` are
+  English. Do not mix inside a file.
 - Keep pure logic out of pygame: everything arithmetic lives in `geometry.py`
   (no pygame import) or works on normalized coordinates (`saccade.py`), which is
   what makes `tests/` runnable without a display.
@@ -130,25 +133,22 @@ git config core.hooksPath scripts/hooks    # enable the secret guard (once)
 
 ## Known gaps / next steps
 
-1. **User-visible strings are still French** (`App.report()`, the warnings from
-   `Config.validate()`, the argparse help). For a public English repository they
-   should be translated. Nothing asserts on those strings, so it is a safe but
-   broad change.
-2. **Code comments/docstrings are French**, like the rest of the Intellar code
-   base. Same decision as above.
-3. **Two dead PNG blobs are still in history** (`docs/demo_1.png`,
+1. **Code comments and docstrings are French**, like the rest of the Intellar
+   code base; everything user-visible is English (see Conventions). Translating
+   the comments too would be a large, purely cosmetic change.
+2. **Two dead PNG blobs are still in history** (`docs/demo_1.png`,
    `docs/demo_2.png`, ~1.3 MB) from before they were converted to JPEG. Removing
    them needs a history rewrite (`git filter-branch --index-filter …`).
-4. **No CI.** The test suite is headless and takes ~5 s, and
+3. **No CI.** The test suite is headless and takes ~5 s, and
    `python main.py --selftest` works headless too, so a GitHub Actions matrix
    (ubuntu + windows) would be cheap. None of the sibling Intellar repositories
    has CI, which is why there is none here.
-5. **The eye images are AI-generated** and this is now documented: Google's
+4. **The eye images are AI-generated** and this is now documented: Google's
    image model, C2PA-signed, SynthID watermarked (`assets/README.md`). The code
    is MIT; the images are used under Google's terms for generative output, and
    their AI origin has to be disclosed when they are reused. Read from the C2PA
    manifests, not assumed.
-6. **The pupil fade is effectively dead code with the shipped images**: the
+5. **The pupil fade is effectively dead code with the shipped images**: the
    photometric distance between them (230.5/255) is far above
    `FADE_THRESHOLD = 15.0`, so the code always takes the hard-cut path. Keep it
    (it is the right behaviour for pairs that do match), but do not "fix" it by

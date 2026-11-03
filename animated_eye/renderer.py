@@ -126,17 +126,17 @@ def open_window(
         notes: list[str] = []
         if errors:
             notes.append(
-                f"pilote video {active} (repli apres "
+                f"video driver {active} (fallback after "
                 + " / ".join(errors)
                 + ")"
             )
         return surface, active, notes
 
     raise RuntimeError(
-        "aucune fenetre possible : "
+        "no usable window: "
         + " ; ".join(errors)
-        + "\n  essayer sans SDL_VIDEODRIVER, puis depuis le bureau du Pi, "
-        "et verifier que l'utilisateur est dans le groupe video"
+        + "\n  try without SDL_VIDEODRIVER, then from the Pi desktop, "
+        "and check that the user is in the video group"
     )
 
 

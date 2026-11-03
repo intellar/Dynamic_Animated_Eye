@@ -64,12 +64,15 @@ def main(argv: list[str]) -> int:
     summary = len(args) != len(argv)
 
     if not args:
-        print(__doc__, file=sys.stderr)
+        print(
+            "usage: python scripts/hash_manifest.py <root> [item ...] [--digest]",
+            file=sys.stderr,
+        )
         return 2
 
     root = Path(args[0]).resolve()
     if not root.is_dir():
-        print(f"racine introuvable : {root}", file=sys.stderr)
+        print(f"root directory not found: {root}", file=sys.stderr)
         return 2
     items = args[1:] or ["."]
 

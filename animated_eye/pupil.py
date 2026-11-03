@@ -53,8 +53,8 @@ class PupilState:
             return
         if residual > FADE_THRESHOLD:
             self.warnings.append(
-                f"pupil_pair {self.pair} : ecart photometrique {residual:.1f}/255 > "
-                f"{FADE_THRESHOLD:.0f}, fondu desactive (coupe pendant les saccades)"
+                f"pupil_pair {self.pair}: photometric residual {residual:.1f}/255 > "
+                f"{FADE_THRESHOLD:.0f}, fade disabled (hard cut during saccades)"
             )
             self.pair = self.pair[:1]
 

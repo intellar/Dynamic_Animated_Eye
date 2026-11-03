@@ -55,8 +55,8 @@ class App:
             return []
         self.cfg.travel_x, self.cfg.travel_y = tx, ty
         return [
-            f"debattement ramene a {tx} x {ty} px "
-            f"(monde trop grand pour {view_w}x{view_h})"
+            f"travel reduced to {tx} x {ty} px "
+            f"(world too large for {view_w}x{view_h})"
         ]
 
     def _resolve_travel(self) -> list[str]:
@@ -74,17 +74,17 @@ class App:
         tx, ty = scale_travel(*self.requested_travel, view_w, view_h)
         if (tx, ty) != tuple(self.requested_travel):
             notes.append(
-                f"debattement mis a l'echelle de l'ecran {view_w}x{view_h} : "
+                f"travel scaled to the {view_w}x{view_h} screen: "
                 f"{tx} x {ty} px (reference {self.requested_travel[0]} x "
-                f"{self.requested_travel[1]} pour 1920x1080)"
+                f"{self.requested_travel[1]} for 1920x1080)"
             )
 
         iris = self.eyes[self.pupil.index].iris_diameter_screen
         fx, fy = fit_travel(tx, ty, view_w, view_h, iris)
         if (fx, fy) != (tx, ty):
             notes.append(
-                f"debattement borne a {fx} x {fy} px pour que l'iris "
-                f"({iris:.0f} px) reste dans le cadre {view_w}x{view_h}"
+                f"travel clamped to {fx} x {fy} px so that the iris "
+                f"({iris:.0f} px) stays inside the {view_w}x{view_h} frame"
             )
         self.cfg.travel_x, self.cfg.travel_y = fx, fy
 
@@ -98,9 +98,9 @@ class App:
         self.eyes = load_eyes(self.cfg, view_size)
         if self.eyes.scale_capped:
             self.notes.append(
-                f"oeil plafonne a l'echelle {self.eyes.scale:.3f} "
-                f"(demande {self.eyes.requested_scale:.3f}) : image limitee a "
-                f"{MAX_SPRITE_EXTENT} px de cote"
+                f"eye capped at scale {self.eyes.scale:.3f} "
+                f"(requested {self.eyes.requested_scale:.3f}): image limited to "
+                f"{MAX_SPRITE_EXTENT} px per side"
             )
         self.pupil = PupilState(self.eyes, self.cfg)
         self.notes.extend(self.pupil.warnings)
@@ -119,46 +119,46 @@ class App:
         )
         if not is_region_of_interest(view_w, view_h, sprite_size):
             self.notes.append(
-                f"l'oeil ({sprite_size[0]}x{sprite_size[1]} px) tient entierement "
-                f"dans la fenetre ({view_w}x{view_h}) : augmenter iris_fraction "
-                f"pour que la fenetre soit une decoupe de l'image"
+                f"the eye ({sprite_size[0]}x{sprite_size[1]} px) fits entirely "
+                f"inside the window ({view_w}x{view_h}): raise iris_fraction "
+                f"so that the window is a crop of the image"
             )
 
     def report(self) -> str:
         assert self.eyes is not None and self.pupil is not None
         sprite = self.eyes[self.pupil.index]
-        travel = f"debattement  x +/-{self.cfg.travel_x} px   y +/-{self.cfg.travel_y} px"
+        travel = f"travel       x +/-{self.cfg.travel_x} px   y +/-{self.cfg.travel_y} px"
         if (self.cfg.travel_x, self.cfg.travel_y) != tuple(self.requested_travel):
             travel += (
                 f"  (reference {self.requested_travel[0]} x "
-                f"{self.requested_travel[1]} pour 1920x1080)"
+                f"{self.requested_travel[1]} for 1920x1080)"
             )
         lines = [
-            f"fenetre      {self.renderer.size[0]}x{self.renderer.size[1]}"
-            f"  ecran {self.cfg.display}  pilote {self.renderer.driver or '?'}",
-            f"monde        {self.world.surface.get_size()[0]}x"
+            f"window       {self.renderer.size[0]}x{self.renderer.size[1]}"
+            f"  screen {self.cfg.display}  driver {self.renderer.driver or '?'}",
+            f"world        {self.world.surface.get_size()[0]}x"
             f"{self.world.surface.get_size()[1]}",
-            f"oeil         {sprite.name}  {sprite.size[0]}x{sprite.size[1]} px"
+            f"eye          {sprite.name}  {sprite.size[0]}x{sprite.size[1]} px"
             f"  iris {sprite.iris_diameter_screen:.0f} px"
-            f" ({sprite.iris_diameter_screen / self.renderer.size[1]:.0%} de la hauteur)"
-            f"  echelle {self.eyes.scale:.3f}",
+            f" ({sprite.iris_diameter_screen / self.renderer.size[1]:.0%} of the height)"
+            f"  scale {self.eyes.scale:.3f}",
             travel,
         ]
         roi = is_region_of_interest(
             self.renderer.size[0], self.renderer.size[1], sprite.size
         )
         lines.append(
-            "cadrage      "
+            "framing      "
             + (
-                "ROI : la fenetre montre une decoupe de l'image"
+                "ROI: the window shows a crop of the image"
                 if roi
-                else "l'image tient dans la fenetre (pas de ROI)"
+                else "the image fits in the window (no ROI)"
             )
         )
         for i, other in enumerate(self.eyes.sprites):
             r = self.eyes.residual(self.pupil.index, i)
             if r is not None and i != self.pupil.index:
-                lines.append(f"ecart {sprite.name} <-> {other.name} : {r:.1f}/255")
+                lines.append(f"residual {sprite.name} <-> {other.name}: {r:.1f}/255")
         return "\n".join(lines)
 
     # ----------------------------------------------------------------- events
@@ -258,7 +258,7 @@ class App:
             f"phase    {phase}",
             f"position {s.pos[0]:+.3f} {s.pos[1]:+.3f}",
             f"amplitude {s.saccade_amplitude_px:6.1f} px",
-            f"oeil     {sprite.name}  {self.pupil.index + 1}/{len(self.eyes)}"
+            f"eye      {sprite.name}  {self.pupil.index + 1}/{len(self.eyes)}"
             f"   auto {'on' if self.pupil.auto else 'off'}",
             f"travel   {self.cfg.travel_x} x {self.cfg.travel_y}",
         ]

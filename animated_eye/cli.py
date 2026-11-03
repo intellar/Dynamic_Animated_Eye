@@ -37,12 +37,12 @@ def list_displays() -> int:
         return 1
     for note in notes:
         print(f"  ! {note}")
-    print(f"pilote video : {driver}")
+    print(f"video driver: {driver}")
     sizes = desktop_sizes()
     if not sizes:
-        print("aucun ecran detecte")
+        print("no screen detected")
     for i, (w, h) in enumerate(sizes):
-        print(f"ecran {i} : {w}x{h}")
+        print(f"screen {i}: {w}x{h}")
     pygame.quit()
     return 0
 
@@ -66,18 +66,18 @@ def selftest(cfg: Config, frames: int = 120) -> int:
     for eye in app.eyes:
         if not is_region_of_interest(view_w, view_h, eye.size):
             problems.append(
-                f"{eye.name} ({eye.size[0]}x{eye.size[1]} px) tient entierement "
-                f"dans la fenetre {view_w}x{view_h} : la fenetre doit etre une "
-                f"decoupe de l'image (augmenter iris_fraction)"
+                f"{eye.name} ({eye.size[0]}x{eye.size[1]} px) fits entirely "
+                f"inside the {view_w}x{view_h} window: the window must be a "
+                f"crop of the image (raise iris_fraction)"
             )
         elif not app.world.sprite_rect.colliderect(app.world.viewport(1.0, 1.0)):
-            problems.append(f"{eye.name} sort completement du cadre a +1,+1")
+            problems.append(f"{eye.name} leaves the frame completely at +1,+1")
 
     pair = tuple(app.cfg.pupil_pair)
     if len(pair) == 2:
         residual = app.eyes.residual(pair[0], pair[1])
         if residual is not None:
-            print(f"  ecart pupille {pair[0]} <-> {pair[1]} : {residual:.1f}/255")
+            print(f"  pupil residual {pair[0]} <-> {pair[1]}: {residual:.1f}/255")
 
     clock = app.renderer.clock
     start = time.perf_counter()
@@ -89,11 +89,11 @@ def selftest(cfg: Config, frames: int = 120) -> int:
     app.renderer.close()
 
     print(
-        f"selftest : {frames} frames en {elapsed:.2f} s "
-        f"({frames / elapsed:.0f} fps hors vsync)"
+        f"selftest: {frames} frames in {elapsed:.2f} s "
+        f"({frames / elapsed:.0f} fps without vsync)"
     )
     for problem in problems:
-        print(f"  ERREUR {problem}")
+        print(f"  ERROR {problem}")
     return 1 if problems else 0
 
 
@@ -107,11 +107,11 @@ def main(argv: list[str] | None = None) -> int:
 
     app = App(cfg)
     _report(app)
-    print("  echap/q quitter   f plein ecran   b noir   d hud   espace saccade")
+    print("  esc/q quit   f full screen   b black   d hud   space next image")
     keys = "/".join(str(i + 1) for i in range(len(app.cfg.images)))
     print(
         f"  {keys} image{'s' if len(app.cfg.images) > 1 else ''}       "
-        "p pupille auto   r nouvelle graine"
+        "p pupil auto   r new seed"
     )
     sys.stdout.flush()
     return app.run()

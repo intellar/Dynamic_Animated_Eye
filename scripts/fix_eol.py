@@ -52,7 +52,7 @@ def main(argv: list[str]) -> int:
     args = [a for a in argv if not a.startswith("-")]
     root = Path(args[0]).resolve() if args else Path(".").resolve()
     if not root.is_dir():
-        print(f"racine introuvable : {root}", file=sys.stderr)
+        print(f"root directory not found: {root}", file=sys.stderr)
         return 2
 
     changed = 0
@@ -68,7 +68,7 @@ def main(argv: list[str]) -> int:
             changed += 1
             print(f"lf  {rel.as_posix()}")
 
-    print(f"{changed} fichier(s) normalise(s)")
+    print(f"{changed} file(s) normalised")
     return 0
 
 

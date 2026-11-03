@@ -14,7 +14,7 @@ UNIT=animated-eye.service
 APP_DIR=$(cd "$(dirname "$0")/.." && pwd)
 
 if [ "$(id -u)" -ne 0 ]; then
-    echo "a lancer avec sudo : sudo sh $APP_DIR/scripts/install_service.sh" >&2
+    echo "run it with sudo: sudo sh $APP_DIR/scripts/install_service.sh" >&2
     exit 1
 fi
 
@@ -22,13 +22,13 @@ if [ "${1:-}" = "--remove" ]; then
     systemctl disable --now "$UNIT" 2>/dev/null || true
     rm -f "/etc/systemd/system/$UNIT"
     systemctl daemon-reload
-    echo "service $UNIT desinstalle"
+    echo "service $UNIT removed"
     exit 0
 fi
 
 RUN_USER=${SUDO_USER:-$(id -un)}
 if [ "$RUN_USER" = root ]; then
-    echo "impossible de deviner le compte : lancer sudo depuis le compte du Pi" >&2
+    echo "cannot guess the account: run sudo from the Pi user account" >&2
     exit 1
 fi
 
@@ -48,7 +48,7 @@ sleep 2
 systemctl --no-pager --lines=12 status "$UNIT" || true
 
 echo
-echo "demarrage au boot actif : $UNIT (utilisateur $RUN_USER, dossier $APP_DIR)"
-echo "journal   : journalctl -u $UNIT -f"
-echo "arreter   : sudo systemctl stop $UNIT"
-echo "retirer   : sudo sh $APP_DIR/scripts/install_service.sh --remove"
+echo "boot start enabled: $UNIT (user $RUN_USER, directory $APP_DIR)"
+echo "log     : journalctl -u $UNIT -f"
+echo "stop    : sudo systemctl stop $UNIT"
+echo "remove  : sudo sh $APP_DIR/scripts/install_service.sh --remove"

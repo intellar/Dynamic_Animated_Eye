@@ -22,10 +22,10 @@ os.environ.setdefault("PYGAME_HIDE_SUPPORT_PROMPT", "1")
 
 DRIVERS = ("kmsdrm", "x11", "wayland", "dummy")
 HINTS = {
-    "kmsdrm": "pas de carte DRM accessible (groupe video) ou SDL sans KMSDRM",
-    "x11": "pas de session X (bureau) joignable",
-    "wayland": "pas de compositeur Wayland joignable",
-    "dummy": "toujours disponible, mais n'affiche rien",
+    "kmsdrm": "no accessible DRM card (video group) or SDL without KMSDRM",
+    "x11": "no reachable X session (desktop)",
+    "wayland": "no reachable Wayland compositor",
+    "dummy": "always available, but draws nothing",
 }
 
 
@@ -60,7 +60,7 @@ def probe(driver: str) -> tuple[bool, str]:
         return False, str(exc)
     size = "x".join(str(v) for v in surface.get_size())
     real = pygame.display.get_driver()
-    return True, f"{size}, pilote retenu {real}"
+    return True, f"{size}, driver in use {real}"
 
 
 def main() -> int:
@@ -68,19 +68,19 @@ def main() -> int:
     card = kms_card()
     if card:
         os.environ["SDL_VIDEO_KMSDRM_DEVICE"] = card
-        print(f"carte DRM avec un ecran branche : {card}")
+        print(f"DRM card with a connected display: {card}")
     else:
-        print("aucun connecteur `connected` dans /sys/class/drm")
+        print("no `connected` connector in /sys/class/drm")
 
     import pygame
 
     print(f"pygame {pygame.version.ver}  SDL {pygame.get_sdl_version()}")
-    print(f"fichier {pygame.__file__}")
+    print(f"file {pygame.__file__}")
 
     usable: list[str] = []
     for driver in DRIVERS:
         ok, detail = probe(driver)
-        mark = "ok  " if ok else "non "
+        mark = "ok  " if ok else "no  "
         print(f"  {mark} {driver:<8} {detail}")
         if ok and driver != "dummy":
             usable.append(driver)
@@ -90,19 +90,19 @@ def main() -> int:
 
     if usable:
         if usable[0] == "kmsdrm":
-            print("\npour projeter : sh scripts/run_kms.sh   (kmsdrm sur la bonne carte)")
+            print("\nto project: sh scripts/run_kms.sh   (kmsdrm on the right card)")
         else:
-            print(f"\npour projeter : SDL_VIDEODRIVER={usable[0]} python main.py")
+            print(f"\nto project: SDL_VIDEODRIVER={usable[0]} python main.py")
         return 0
 
-    print("\naucun pilote d'affichage reel :")
+    print("\nno real display driver:")
     for driver in DRIVERS[:-1]:
         print(f"  {driver:<8} {HINTS[driver]}")
     print(
-        "\nsi kmsdrm manque alors que /dev/dri/card0 est accessible, c'est le\n"
-        "pygame installe : sudo apt install -y python3-pygame puis\n"
-        ".venv/bin/python -m pip uninstall -y pygame (le venv est cree avec\n"
-        "--system-site-packages, il prendra le pygame du systeme)."
+        "\nif kmsdrm is missing while /dev/dri/card0 is accessible, the pygame\n"
+        "installed is the culprit: sudo apt install -y python3-pygame then\n"
+        ".venv/bin/python -m pip uninstall -y pygame (the venv is created with\n"
+        "--system-site-packages, so it will pick up the system pygame)."
     )
     return 1
 

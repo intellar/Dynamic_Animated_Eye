@@ -103,45 +103,45 @@ class Config:
         unknown = getattr(self, "_unknown_keys", ())
         if unknown:
             warnings.append(
-                "cles inconnues dans la configuration, ignorees : "
+                "unknown keys in the configuration, ignored: "
                 + ", ".join(unknown)
             )
 
         if not self.images:
             self.images = ["eye2.jpg"]
-            warnings.append("aucune image fournie, retour a eye2.jpg")
+            warnings.append("no image given, falling back to eye2.jpg")
 
         if self.reference_image is not None and self.reference_image not in self.images:
             warnings.append(
-                f"reference_image {self.reference_image!r} absente de images, "
-                "utilisation de la premiere image"
+                f"reference_image {self.reference_image!r} is not in images, "
+                "using the first image"
             )
             self.reference_image = None
 
         if not 0.02 <= self.iris_fraction <= 2.0:
             warnings.append(
-                f"iris_fraction {self.iris_fraction} hors bornes, ramene a 0.51"
+                f"iris_fraction {self.iris_fraction} out of range, set back to 0.51"
             )
             self.iris_fraction = 0.51
 
         if not 0.0 <= self.feather <= 0.45:
-            warnings.append(f"feather {self.feather} hors bornes, ramene a 0.12")
+            warnings.append(f"feather {self.feather} out of range, set back to 0.12")
             self.feather = 0.12
 
         if self.travel_x < 0 or self.travel_y < 0:
-            warnings.append("travel negatif, ramene a 0")
+            warnings.append("negative travel, set back to 0")
             self.travel_x = max(0, self.travel_x)
             self.travel_y = max(0, self.travel_y)
 
         if self.fixation_min_ms > self.fixation_max_ms:
-            warnings.append("fixation_min_ms > fixation_max_ms, inversion")
+            warnings.append("fixation_min_ms > fixation_max_ms, swapped")
             self.fixation_min_ms, self.fixation_max_ms = (
                 self.fixation_max_ms,
                 self.fixation_min_ms,
             )
 
         if self.saccade_min_ms > self.saccade_max_ms:
-            warnings.append("saccade_min_ms > saccade_max_ms, inversion")
+            warnings.append("saccade_min_ms > saccade_max_ms, swapped")
             self.saccade_min_ms, self.saccade_max_ms = (
                 self.saccade_max_ms,
                 self.saccade_min_ms,
@@ -150,24 +150,24 @@ class Config:
         pair = [i for i in self.pupil_pair if 0 <= i < len(self.images)]
         if len(set(pair)) != len(pair) or len(pair) < 2:
             warnings.append(
-                "pupil_pair invalide (il faut deux indices distincts), "
-                "animation de pupille desactivee"
+                "invalid pupil_pair (two distinct indices are required), "
+                "pupil animation disabled"
             )
             pair = []
         self.pupil_pair = pair
 
         if not 0 <= self.start_eye_index < len(self.images):
             warnings.append(
-                f"start_eye_index {self.start_eye_index} hors bornes, ramene a 0"
+                f"start_eye_index {self.start_eye_index} out of range, set back to 0"
             )
             self.start_eye_index = 0
 
         if self.fps <= 0:
-            warnings.append(f"fps {self.fps} invalide, ramene a 60")
+            warnings.append(f"invalid fps {self.fps}, set back to 60")
             self.fps = 60
 
         if self.width <= 0 or self.height <= 0:
-            warnings.append("resolution invalide, retour a 1920x1080")
+            warnings.append("invalid resolution, falling back to 1920x1080")
             self.width, self.height = 1920, 1080
 
         return warnings
@@ -217,54 +217,55 @@ def build_parser() -> argparse.ArgumentParser:
     """Chaque option vaut SUPPRESS : seules celles reellement passees ecrasent."""
     parser = argparse.ArgumentParser(
         prog="animated_eye",
-        description="Oeil anime projete en plein ecran, avec saccades.",
+        description="Full-screen animated eye, with saccades.",
     )
-    parser.add_argument("--config", type=Path, help="chemin d'un config.json")
+    parser.add_argument("--config", type=Path, help="path to a config.json")
     parser.add_argument("--list-displays", action="store_true",
-                        help="afficher les moniteurs disponibles puis quitter")
+                        help="list the available displays, then exit")
     parser.add_argument("--selftest", action="store_true",
-                        help="charger les images et rendre quelques frames hors "
-                             "ecran, puis quitter (verification apres deploiement)")
+                        help="load the images and render a few frames off "
+                             "screen, then exit (check after a deployment)")
 
     def opt(name: str, **kwargs: Any) -> None:
         parser.add_argument(name, default=argparse.SUPPRESS, **kwargs)
 
     # images / pupille
     opt("--images", type=_csv_list, metavar="A.jpg,B.jpg",
-        help="liste des images d'oeil (defaut : les trois de assets/)")
-    opt("--reference-image", dest="reference_image", metavar="NOM",
-        help="image qui definit l'echelle commune")
+        help="eye image list (default: the three in assets/)")
+    opt("--reference-image", dest="reference_image", metavar="NAME",
+        help="image that sets the common scale")
     opt("--pupil-pair", dest="pupil_pair", type=_csv_ints, metavar="I,J",
-        help="indices de la paire pour l'animation de pupille (defaut 0,1)")
+        help="indices of the pair used for the pupil animation (default 0,1)")
     opt("--no-normalize", dest="normalize_luma", action="store_false",
-        help="desactiver l'egalisation de luminosite entre images")
+        help="disable the brightness equalisation between images")
     opt("--pupil-switch-chance", dest="pupil_switch_chance", type=float,
-        metavar="P", help="probabilite de changer de pupille a chaque saccade")
+        metavar="P", help="chance of swapping the pupil on each saccade")
     opt("--pupil-fade-ms", dest="pupil_fade_ms", type=float, metavar="MS",
-        help="duree du fondu de pupille")
+        help="pupil fade duration")
     opt("--start-eye", dest="start_eye_index", type=int, metavar="N",
-        help="indice de l'image affichee au demarrage")
+        help="index of the image shown at start-up")
     opt("--no-pupil-auto", dest="pupil_auto", action="store_false",
-        help="desactiver l'animation automatique de la pupille")
+        help="disable the automatic pupil animation")
 
     # fenetre
-    opt("--display", type=int, metavar="N", help="index du moniteur (0 = principal)")
+    opt("--display", type=int, metavar="N",
+        help="monitor index (0 = main screen)")
     opt("--width", type=int, metavar="PX")
     opt("--height", type=int, metavar="PX")
     opt("--window", dest="fullscreen", action="store_false",
-        help="lancer en fenetre (developpement)")
+        help="run windowed (development)")
     opt("--no-auto-size", dest="auto_size", action="store_false",
-        help="ne pas prendre la resolution native du moniteur")
+        help="do not use the native resolution of the monitor")
     opt("--fps", type=int, metavar="N")
     opt("--no-vsync", dest="vsync", action="store_false")
 
     # cadrage
     opt("--iris-fraction", dest="iris_fraction", type=float, metavar="F",
-        help="diametre de l'iris en fraction de la hauteur (defaut 0.51)")
+        help="iris diameter as a fraction of the height (default 0.51)")
     opt("--travel-x", dest="travel_x", type=int, metavar="PX")
     opt("--travel-y", dest="travel_y", type=int, metavar="PX")
     opt("--feather", type=float, metavar="F",
-        help="largeur du fondu des bords du patch (defaut 0.12)")
+        help="width of the fade on the patch edges (default 0.12)")
 
     # saccades
     opt("--fixation-min-ms", dest="fixation_min_ms", type=float, metavar="MS")
@@ -277,10 +278,11 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="PX")
     opt("--drift-px-per-s", dest="drift_px_per_s", type=float, metavar="PX")
     opt("--max-amplitude", dest="max_amplitude", type=float, metavar="F")
-    opt("--seed", type=int, metavar="N", help="graine aleatoire (reproductible)")
+    opt("--seed", type=int, metavar="N",
+        help="random seed (reproducible run)")
 
     # divers
-    opt("--debug", action="store_true", help="afficher le HUD au demarrage")
+    opt("--debug", action="store_true", help="show the HUD at start-up")
     return parser
 
 

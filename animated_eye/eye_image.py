@@ -326,7 +326,7 @@ def load_eyes(cfg: Config, view_size: tuple[int, int] | int) -> EyeSet:
     missing = [str(p) for p in paths if not p.exists()]
     if missing:
         raise FileNotFoundError(
-            "images introuvables : " + ", ".join(missing)
+            "images not found: " + ", ".join(missing)
         )
 
     sources = [np.asarray(Image.open(p).convert("RGB")) for p in paths]
@@ -336,7 +336,7 @@ def load_eyes(cfg: Config, view_size: tuple[int, int] | int) -> EyeSet:
     ref_measure = measurements[ref_index]
     if ref_measure.iris_radius <= 0.0:
         raise ValueError(
-            f"impossible de mesurer l'iris dans {paths[ref_index].name}"
+            f"cannot measure the iris in {paths[ref_index].name}"
         )
 
     src_h, src_w = sources[ref_index].shape[:2]

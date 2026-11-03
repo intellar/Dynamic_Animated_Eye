@@ -57,18 +57,25 @@ they are ignored when the settings are applied.
 ## What start-up prints
 
 ```
-fenetre      1920x1080  ecran 0
-monde        3456x2636
-oeil         eye4  2136x2136 px  iris 551 px (51% de la hauteur)  echelle 1.043
-debattement  x +/-660 px   y +/-250 px
-cadrage      ROI : la fenetre montre une decoupe de l'image
-ecart eye4 <-> eye2 : 230.5/255
-  ! pupil_pair [0, 1] : ecart photometrique 230.5/255 > 15, fondu desactive (coupe pendant les saccades)
+window       1920x1080  screen 0  driver x11
+world        3456x2636
+eye          eye4  2136x2136 px  iris 551 px (51% of the height)  scale 1.043
+travel       x +/-660 px   y +/-250 px
+framing      ROI: the window shows a crop of the image
+residual eye4 <-> eye2: 230.5/255
+residual eye4 <-> eye3: 184.3/255
+  ! pupil_pair [0, 1]: photometric residual 230.5/255 > 15, fade disabled (hard cut during saccades)
 ```
 
-The console output is still in French: it comes from the code, not from the
-documentation. `cadrage` should read `ROI : ...`; `l'image tient dans la fenetre`
-means `iris_fraction` is too small (see [DESIGN.md](DESIGN.md)).
+`window` is the size actually opened, with the screen index and the video driver
+(`dummy` under `--selftest`). `world` must equal the image side plus twice the
+travel. `framing` should read `ROI: ...`; `the image fits in the window` means
+`iris_fraction` is too small (see [DESIGN.md](DESIGN.md)).
+
+A line starting with `!` is a warning: a corrected value, a disabled fade, a
+fallback driver. `--selftest` adds `selftest: 120 frames in ... s (... fps
+without vsync)` and an `ERROR` line per framing problem, and exits non-zero if
+there is one.
 
 ## Adding images
 

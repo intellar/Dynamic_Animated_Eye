@@ -22,11 +22,11 @@ for status in /sys/class/drm/card*-*/status; do
 done
 
 if [ -z "$CARD" ]; then
-    echo "aucun ecran branche : verifier le cable HDMI" >&2
+    echo "no display connected: check the HDMI cable" >&2
     exit 1
 fi
 
-echo "ecran detecte sur $CARD"
+echo "display detected on $CARD"
 export SDL_VIDEODRIVER=kmsdrm
 export SDL_VIDEO_KMSDRM_DEVICE="$CARD"
 exec .venv/bin/python main.py "$@"

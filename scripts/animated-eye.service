@@ -1,5 +1,5 @@
 [Unit]
-Description=Animated eye (projection plein ecran, pilote SDL kmsdrm)
+Description=Animated eye (full-screen projection, SDL kmsdrm driver)
 # L'oeil n'a pas besoin de bureau : il prend l'ecran directement en DRM.
 # Demarrage apres la fin du boot, et redemarrage sans limite : au boot le lien
 # HDMI n'est pas forcement pret, et un plantage doit se rattraper tout seul

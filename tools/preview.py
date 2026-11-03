@@ -67,10 +67,10 @@ def render_world_views(
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="planches de controle")
+    parser = argparse.ArgumentParser(description="control sheets")
     parser.add_argument("--out", type=Path, default=PROJECT_ROOT / "preview")
     parser.add_argument("--view", default="1920x1080")
-    parser.add_argument("--travel", default=None, help="defaut: celui de la config")
+    parser.add_argument("--travel", default=None, help="default: the one in the config")
     parser.add_argument("--iris-fraction", type=float, default=None)
     parser.add_argument("--feather", type=float, default=None)
     args = parser.parse_args(argv)
@@ -92,16 +92,16 @@ def main(argv: list[str] | None = None) -> int:
     args.out.mkdir(parents=True, exist_ok=True)
 
     eyes = load_eyes(cfg, (view_w, view_h))
-    print(f"echelle commune {eyes.scale:.4f}" + (" (plafonnee)" if eyes.scale_capped else ""))
+    print(f"common scale {eyes.scale:.4f}" + (" (capped)" if eyes.scale_capped else ""))
     for sprite in eyes.sprites:
         m = sprite.measurement
         print(
-            f"  {sprite.name:10s} iris {m.iris_diameter:6.1f} px source"
-            f" ({m.iris_fraction:.1%}) -> {sprite.iris_diameter_screen:6.1f} px ecran"
+            f"  {sprite.name:10s} iris {m.iris_diameter:6.1f} px in the source"
+            f" ({m.iris_fraction:.1%}) -> {sprite.iris_diameter_screen:6.1f} px on screen"
             f"  sclera {m.sclera_level:.0f}"
         )
     for (i, j), r in sorted(eyes.residuals.items()):
-        print(f"  ecart {eyes.sprites[i].name} <-> {eyes.sprites[j].name} : {r:.1f}/255")
+        print(f"  residual {eyes.sprites[i].name} <-> {eyes.sprites[j].name}: {r:.1f}/255")
 
     # --- monde complet ------------------------------------------------------
     pupil = PupilState(eyes, cfg)
@@ -109,8 +109,8 @@ def main(argv: list[str] | None = None) -> int:
     world = build_world(view_w, view_h, travel_x, travel_y, sprite.size)
     world.paint_sprite(sprite.surface)
     print(
-        f"monde {world.surface.get_size()}  image {sprite.size}"
-        f"  marge {world.rest_origin}  viewport {world.viewport(0, 0)}"
+        f"world {world.surface.get_size()}  image {sprite.size}"
+        f"  margin {world.rest_origin}  viewport {world.viewport(0, 0)}"
     )
     scale = min(1.0, 900 / max(world.surface.get_size()))
     full = pygame.transform.smoothscale(
@@ -120,7 +120,7 @@ def main(argv: list[str] | None = None) -> int:
     border.size = (int(border.width * scale), int(border.height * scale))
     border.center = (full.get_width() // 2, full.get_height() // 2)
     pygame.draw.rect(full, (60, 200, 90), border, 2)
-    _label(full, "monde complet, cadre vert = fenetre au repos")
+    _label(full, "whole world, green box = window at rest")
     pygame.image.save(full, str(args.out / "world.png"))
 
     # --- chaque oeil, quatre coins -----------------------------------------
@@ -166,16 +166,16 @@ def main(argv: list[str] | None = None) -> int:
             fixes.append(ctrl.duration_ms)
     if amps:
         print(
-            f"\n30 s de simulation : {len(amps)} saccades, "
-            f"amplitude moyenne {sum(amps) / len(amps):.0f} px "
-            f"(max {max(amps):.0f}), duree {sum(durs) / len(durs):.0f} ms "
+            f"\n30 s of simulation: {len(amps)} saccades, "
+            f"mean amplitude {sum(amps) / len(amps):.0f} px "
+            f"(max {max(amps):.0f}), duration {sum(durs) / len(durs):.0f} ms "
             f"({min(durs):.0f}-{max(durs):.0f})"
         )
-        print(f"fixations : {sum(fixes) / len(fixes):.0f} ms moyenne ({len(fixes)} mesures)")
-        print(f"saccades par seconde : {len(amps) / 30:.1f}")
+        print(f"fixations: {sum(fixes) / len(fixes):.0f} ms mean ({len(fixes)} samples)")
+        print(f"saccades per second: {len(amps) / 30:.1f}")
 
     pygame.quit()
-    print(f"\nplanches ecrites dans {args.out}")
+    print(f"\ncontrol sheets written to {args.out}")
     return 0
 
 
