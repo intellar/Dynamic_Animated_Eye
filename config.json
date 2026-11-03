@@ -1,0 +1,38 @@
+{
+  "images": [
+    "eye4.jpg",
+    "eye2.jpg",
+    "eye3.jpg"
+  ],
+  "reference_image": "eye4.jpg",
+  "pupil_pair": [
+    0,
+    1
+  ],
+  "normalize_luma": true,
+  "pupil_switch_chance": 0.12,
+  "pupil_fade_ms": 150.0,
+  "start_eye_index": 0,
+  "pupil_auto": true,
+  "display": 0,
+  "width": 1920,
+  "height": 1080,
+  "fullscreen": true,
+  "auto_size": true,
+  "fps": 60,
+  "vsync": true,
+  "iris_fraction": 0.51,
+  "travel_x": 660,
+  "travel_y": 250,
+  "feather": 0.12,
+  "fixation_min_ms": 250.0,
+  "fixation_max_ms": 900.0,
+  "saccade_min_ms": 30.0,
+  "saccade_max_ms": 60.0,
+  "micro_saccade_chance": 0.55,
+  "micro_saccade_max_px": 10.0,
+  "drift_px_per_s": 6.0,
+  "max_amplitude": 1.0,
+  "seed": null,
+  "debug": false
+}

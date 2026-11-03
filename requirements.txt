@@ -1,0 +1,9 @@
+# Sur le Pi, pygame ne vient PAS de pip : le wheel PyPI embarque une SDL2
+# compilee sans KMSDRM, donc incapable de piloter l'ecran depuis une console
+# (le cas d'un Pi sans bureau). Installer `python3-pygame` avec apt : il
+# s'appuie sur la SDL2 du systeme, qui a KMSDRM. Le venv est cree avec
+# --system-site-packages, donc il voit ce pygame sans rien installer.
+pygame>=2.5; platform_system != "Linux"
+numpy>=1.24
+Pillow>=10.0
+pytest>=7.4

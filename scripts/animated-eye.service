@@ -1,0 +1,25 @@
+[Unit]
+Description=Animated eye (projection plein ecran, pilote SDL kmsdrm)
+# L'oeil n'a pas besoin de bureau : il prend l'ecran directement en DRM.
+# Demarrage apres la fin du boot, et redemarrage sans limite : au boot le lien
+# HDMI n'est pas forcement pret, et un plantage doit se rattraper tout seul
+# (StartLimitIntervalSec=0 desactive le plafond de 5 redemarrages de systemd).
+# @USER@ et @APP_DIR@ sont remplis par scripts/install_service.sh.
+After=multi-user.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=@USER@
+WorkingDirectory=@APP_DIR@
+Environment=PYTHONUNBUFFERED=1
+# run_kms.sh choisit la carte DRM qui a un ecran branche (card0 sur Pi 4,
+# card1 sur Pi 5) puis lance .venv/bin/python main.py.
+ExecStart=/bin/sh @APP_DIR@/scripts/run_kms.sh
+Restart=always
+RestartSec=2
+# SIGTERM suffit a pygame ; au-dela on tue tout le groupe.
+TimeoutStopSec=5
+
+[Install]
+WantedBy=multi-user.target

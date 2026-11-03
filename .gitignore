@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+preview/
+*.egg-info/
+
+# Environnements et artefacts locaux
+.venv/
+venv/
+*.log
+
+# Rien de sensible dans le depot (garde-fou : scripts/hooks/pre-commit)
+.env
+.env.*
+*.pem
+*.key
+*.pfx
+*.p12
+*.jks
+*.kdbx
+id_rsa*
+id_ed25519*
+known_hosts
+.netrc
+.pgpass
+.npmrc
+.pypirc
