@@ -43,7 +43,7 @@ done
 dashes='-----'
 key_pat="$dashes"'BEGIN [A-Z ]*PRIVATE KEY'"$dashes"
 gh_pat="gh"'[pousr]_[A-Za-z0-9]{20,}'
-gh_fine="github"'"_pat_[A-Za-z0-9_]{20,}'
+gh_fine="gith"'ub_pat_[A-Za-z0-9_]{20,}'
 aws_pat="AKIA"'[0-9A-Z]{16}'
 sk_pat="sk"'-[A-Za-z0-9]{20,}'
 url_pat="[a-zA-Z][a-zA-Z0-9+.-]*://[^ /:@]+:[^ /@]+@"
