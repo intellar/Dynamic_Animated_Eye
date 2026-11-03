@@ -7,14 +7,14 @@ Un oeil projete en plein ecran qui bouge par saccades : balistique du regard,
 derive oculaire, micro-saccades, pupille qui change. Les photos ci-dessous
 montrent la projection sur la fenetre d'une maison, pour Halloween.
 
-[![L'oeil projete sur la fenetre d'une maison](docs/demo_1.png)](https://youtube.com/shorts/nhEulSRSSkg)
+[![L'oeil projete sur la fenetre d'une maison](docs/demo_1.jpg)](https://youtube.com/shorts/nhEulSRSSkg)
 
 [Voir l'animation en video](https://youtube.com/shorts/nhEulSRSSkg) (YouTube
 Shorts).
 
 | La facade, la nuit | Vue rapprochee : l'iris et ses fibres |
 |---|---|
-| ![L'oeil projete sur la fenetre d'une maison](docs/demo_1.png) | ![L'iris lumineux sur les trois carreaux](docs/demo_2.png) |
+| ![L'oeil projete sur la fenetre d'une maison](docs/demo_1.jpg) | ![L'iris lumineux sur les trois carreaux](docs/demo_2.jpg) |
 
 ## Demarrage rapide
 
