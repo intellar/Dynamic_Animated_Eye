@@ -9,13 +9,11 @@ around with real saccades, drift, micro-saccades and a pupil that changes.
 
 The photos below show it projected onto a house window for Halloween.
 
-[![The eye projected on a house window](docs/demo_1.jpg)](https://youtube.com/shorts/nhEulSRSSkg)
-
-[Watch the animation](https://youtube.com/shorts/nhEulSRSSkg) (YouTube Shorts).
-
 | The facade at night | Close-up: the iris and its fibres |
 |---|---|
-| ![The eye projected on a house window](docs/demo_1.jpg) | ![The glowing iris across the three panes](docs/demo_2.jpg) |
+| [![The eye projected on a house window](docs/demo_1.jpg)](https://youtube.com/shorts/nhEulSRSSkg) | [![The glowing iris across the three panes](docs/demo_2.jpg)](https://youtube.com/shorts/nhEulSRSSkg) |
+
+[Watch the animation](https://youtube.com/shorts/nhEulSRSSkg) (YouTube Shorts).
 
 ## Quick start
 
