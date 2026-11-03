@@ -17,6 +17,9 @@ import os
 import sys
 from pathlib import Path
 
+# pygame affiche un message de bienvenue a l'import : inutile dans un diagnostic.
+os.environ.setdefault("PYGAME_HIDE_SUPPORT_PROMPT", "1")
+
 DRIVERS = ("kmsdrm", "x11", "wayland", "dummy")
 HINTS = {
     "kmsdrm": "pas de carte DRM accessible (groupe video) ou SDL sans KMSDRM",
