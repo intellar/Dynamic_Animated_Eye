@@ -46,6 +46,38 @@ pair is far apart, so the fade is disabled. `eye4` and `eye5` are the exception:
 with `"images": ["eye4.jpg", "eye5.jpg"]` and `"pupil_pair": [0, 1]` the pupil
 cross-fades instead of cutting.
 
+## Provenance
+
+The four images were generated with **Google's generative image model**, and
+they carry signed C2PA content credentials (`Google C2PA Media Services`,
+certificate chain up to `Google C2PA Root CA G3`) that record the actions:
+
+- `c2pa.created` — "Created by Google Generative AI", digital source type
+  `trainedAlgorithmicMedia`;
+- `c2pa.edited` — "Applied imperceptible SynthID watermark";
+- then `c2pa.opened` and `c2pa.resized` — "Opened/Resized by Google Generative
+  AI".
+
+So these are **synthetic images**, watermarked with SynthID and resized by the
+generation service: no photograph, no model, no third party is involved. The
+code is MIT (see [LICENSE](../LICENSE)); the images are used as provided by
+Google's service, under Google's terms for generative output.
+
+Two consequences worth remembering:
+
+- the AI origin is part of every file and should be disclosed when the images are
+  reused elsewhere — several jurisdictions require it (EU AI Act, art. 50), and
+  the embedded manifest already states it;
+- the manifests are signed: editing a file invalidates them. Re-saving an image
+  (as was done here to move the demo photos to JPEG) rewrites or drops the
+  metadata, so keep the originals if the provenance has to stay verifiable.
+
+Verification: https://contentcredentials.org/verify, or locally
+
+```bash
+python -c "print(b'c2pa' in open('assets/eye4.jpg','rb').read())"
+```
+
 ## Constraint
 
 An eye image must be **larger than the screen** once scaled, otherwise the window

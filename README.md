@@ -138,6 +138,8 @@ AI assistant can pick the project up cold: [AGENTS.md](AGENTS.md).
 
 ## License
 
-MIT, see [LICENSE](LICENSE).
+MIT for the code, see [LICENSE](LICENSE). The eye images are AI-generated
+(Google's image model, C2PA-signed and SynthID watermarked); provenance,
+measurements and photometric distances: [assets/README.md](assets/README.md).
 
 

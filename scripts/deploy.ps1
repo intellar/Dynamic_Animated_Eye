@@ -11,7 +11,7 @@
 # Sans -Target, l'hote vient de la variable d'environnement ANIMATED_EYE_TARGET
 # (un `utilisateur@hote`, une IP ou un alias de ~/.ssh/config). Il n'y a plus de
 # cible par defaut : le depot ne doit contenir ni IP du reseau local ni nom de
-# compte, la variable se pose une fois par machine (voir le README).
+# compte, la variable se pose une fois par machine (voir docs/DEPLOY.md).
 # `pi@raspberrypi.local` ne se resout pas depuis Windows, et sous Bookworm
 # l'utilisateur n'est pas forcement `pi` : une IP ou un alias ssh vaut mieux.
 #
@@ -46,13 +46,13 @@ $Root = Split-Path -Parent $PSScriptRoot
 # Cible : -Target, sinon ANIMATED_EYE_TARGET (pratique pour basculer entre deux
 # Pi). On peut y mettre une IP, un hostname ou un alias ssh. Aucune valeur par
 # defaut : elle vivrait dans le depot avec l'IP du reseau local et le nom de
-# compte (voir README, "Deploiement sur le Pi").
+# compte (voir docs/DEPLOY.md).
 if ([string]::IsNullOrWhiteSpace($Target) -and $env:ANIMATED_EYE_TARGET) {
     $Target = $env:ANIMATED_EYE_TARGET.Trim()
 }
 if ([string]::IsNullOrWhiteSpace($Target)) {
     throw ("aucune cible : passer -Target utilisateur@hote, ou definir " +
-           "`$env:ANIMATED_EYE_TARGET = 'utilisateur@hote' (voir le README)")
+           "`$env:ANIMATED_EYE_TARGET = 'utilisateur@hote' (voir docs/DEPLOY.md)")
 }
 
 # Accepte `-Only a,b,c` (tableau) et `-Only "a,b,c"` (chaine).

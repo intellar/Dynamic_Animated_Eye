@@ -143,8 +143,11 @@ git config core.hooksPath scripts/hooks    # enable the secret guard (once)
    `python main.py --selftest` works headless too, so a GitHub Actions matrix
    (ubuntu + windows) would be cheap. None of the sibling Intellar repositories
    has CI, which is why there is none here.
-5. **Provenance and licence of `assets/eye*.jpg` are undocumented.** Clarify
-   before making the repository public.
+5. **The eye images are AI-generated** and this is now documented: Google's
+   image model, C2PA-signed, SynthID watermarked (`assets/README.md`). The code
+   is MIT; the images are used under Google's terms for generative output, and
+   their AI origin has to be disclosed when they are reused. Read from the C2PA
+   manifests, not assumed.
 6. **The pupil fade is effectively dead code with the shipped images**: the
    photometric distance between them (230.5/255) is far above
    `FADE_THRESHOLD = 15.0`, so the code always takes the hard-cut path. Keep it
